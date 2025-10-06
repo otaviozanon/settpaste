@@ -36,7 +36,6 @@ function App() {
       if (!data.url) throw new Error(data.error || "Failed to create paste");
 
       setGeneratedUrl(data.url); // link do Pastebin
-      alert("Paste criado com sucesso!");
     } catch (err) {
       setGeneratedUrl("Error: " + err.message);
     }
