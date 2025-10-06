@@ -31,7 +31,8 @@ function App() {
     formData.append("file", blob, "paste.txt");
 
     try {
-      const res = await fetch("https://corsproxy.io/?https://0x0.st", {
+      const proxyUrl = "https://api.allorigins.win/raw?url=https://0x0.st";
+      const res = await fetch(proxyUrl, {
         method: "POST",
         body: formData,
       });
@@ -47,7 +48,9 @@ function App() {
 
   async function fetchPaste(pasteId) {
     try {
-      const res = await fetch(`https://0x0.st/${pasteId}`);
+      const res = await fetch(
+        `https://api.allorigins.win/raw?url=https://0x0.st/${pasteId}`
+      );
       if (!res.ok) throw new Error("not found");
       const t = await res.text();
       setText(t);
