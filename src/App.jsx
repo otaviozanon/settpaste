@@ -15,21 +15,7 @@ function App() {
     setHighlighted(result.value);
   }, [text]);
 
-  // 🔹 Carrega um paste se houver ?id= ou via ID curto na URL
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    let pasteId = params.get("id");
-
-    // se não tiver ?id=, tenta pegar do path (ex: /hd1Gm5ws)
-    if (!pasteId) {
-      const pathId = window.location.pathname.slice(1); // remove "/"
-      if (pathId) pasteId = pathId;
-    }
-
-    if (pasteId) fetchPaste(pasteId);
-  }, []);
-
-  // 🔹 Envia o texto para o Pastebin via API route e gera ID curto
+  // 🔹 Envia o texto para o Pastebin
   async function uploadText() {
     if (!text.trim()) return;
 
@@ -40,36 +26,21 @@ function App() {
         body: JSON.stringify({ text, title: "Settpaste Note" }),
       });
       const data = await res.json();
-      if (!data.shortId)
-        throw new Error(data.error || "Failed to create paste");
+      if (!data.url) throw new Error(data.error || "Failed to create paste");
 
-      // link curto usando o shortId gerado pela API
-      setGeneratedUrl(`${window.location.origin}/${data.shortId}`);
+      // Retorna link direto do Pastebin
+      setGeneratedUrl(data.url);
     } catch (err) {
       setGeneratedUrl("Error: " + err.message);
     }
   }
 
-  // 🔹 Busca paste pelo ID curto usando API fetchShort
-  async function fetchPaste(pasteId) {
-    try {
-      const res = await fetch(`/api/fetchShort?id=${pasteId}`);
-      if (!res.ok) throw new Error("Paste not found");
-      const t = await res.json();
-      setText(t.text);
-    } catch (err) {
-      setText("Error loading paste: " + err.message);
-    }
-  }
-
-  // 🔹 Copiar link curto
   function copyUrl() {
     if (!generatedUrl) return alert("No URL to copy");
     navigator.clipboard.writeText(generatedUrl);
     alert("URL copied!");
   }
 
-  // 🔹 Sincronizar scroll do textarea com o highlight
   function syncScroll(e) {
     const highlight = document.getElementById("highlighted-output");
     highlight.scrollTop = e.target.scrollTop;
