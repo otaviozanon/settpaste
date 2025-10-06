@@ -7,15 +7,24 @@ function App() {
   const [text, setText] = useState("");
   const [highlighted, setHighlighted] = useState("");
   const [generatedUrl, setGeneratedUrl] = useState("");
+  const [toast, setToast] = useState(null);
+  const [toastVisible, setToastVisible] = useState(false);
 
-  // 🔹 Atualiza o destaque de sintaxe
+  // Update highlight sintax
   useEffect(() => {
     if (!text.trim()) return setHighlighted("");
     const result = hljs.highlightAuto(text);
     setHighlighted(result.value);
   }, [text]);
 
-  // 🔹 Envia o texto para o Pastebin
+  // Animation toast
+  const showToast = (message) => {
+    setToast(message);
+    setToastVisible(true);
+    setTimeout(() => setToastVisible(false), 2000);
+  };
+
+  // Send text to pastebin
   async function uploadText() {
     if (!text.trim()) return;
 
@@ -28,17 +37,18 @@ function App() {
       const data = await res.json();
       if (!data.url) throw new Error(data.error || "Failed to create paste");
 
-      // Retorna link direto do Pastebin
       setGeneratedUrl(data.url);
+      showToast("Sent to Pastebin!");
     } catch (err) {
       setGeneratedUrl("Error: " + err.message);
+      showToast("Error sending!");
     }
   }
 
   function copyUrl() {
-    if (!generatedUrl) return alert("No URL to copy");
+    if (!generatedUrl) return showToast("No URL to copy");
     navigator.clipboard.writeText(generatedUrl);
-    alert("URL copied!");
+    showToast("URL copied!");
   }
 
   function syncScroll(e) {
@@ -50,6 +60,7 @@ function App() {
   return (
     <div className="centered">
       <h1>settpaste</h1>
+
       <div id="paste-form">
         <div className="highlight-wrapper" id="highlight-wrapper">
           <pre>
@@ -68,6 +79,7 @@ function App() {
             onScroll={syncScroll}
           ></textarea>
         </div>
+
         <div
           className="flex-wrapper"
           style={{
@@ -96,6 +108,10 @@ function App() {
           </button>
         </div>
       </div>
+
+      {toast && (
+        <div className={`toast ${toastVisible ? "show" : ""}`}>{toast}</div>
+      )}
     </div>
   );
 }

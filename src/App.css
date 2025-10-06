@@ -145,3 +145,26 @@ code {
 #text::selection {
   background: rgba(149, 136, 49, 0.4);
 }
+
+.toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #292c21;
+  color: #fff;
+  padding: 8px 16px;
+  border: 1px solid #8c9284;
+  border-radius: 4px;
+  font-family: "ArialPixel", monospace;
+  font-size: 14px;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.show {
+  opacity: 0.95;
+  transform: translateX(-50%) translateY(0);
+}
