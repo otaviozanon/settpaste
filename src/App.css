@@ -1,9 +1,11 @@
+/* App.css */
 @import url("https://cdn.jsdelivr.net/gh/ekmas/cs16.css@main/css/cs16.min.css");
 
 body,
 textarea,
 pre,
-code {
+code,
+input {
   font-family: "ArialPixel", monospace;
 }
 
@@ -21,67 +23,6 @@ code {
   bottom: 20px;
   right: 20px;
   text-decoration: none;
-}
-
-.code-block {
-  overflow-x: hidden;
-}
-
-.code-block .inner {
-  position: relative;
-}
-
-.code-block .inner .cs-btn {
-  position: absolute;
-  right: 1px;
-  top: 1px;
-  z-index: 5;
-}
-
-.code-block .inner pre {
-  background-color: #3e4637;
-  border: 1px solid;
-  border-color: #292c21 #8c9284 #8c9284 #292c21;
-  padding: 5px;
-}
-
-.code-block .inner pre code {
-  white-space: pre-wrap;
-}
-
-.code-block .inner pre code::selection {
-  background-color: #958831;
-  color: #fff;
-}
-
-.hljs {
-  color: #e0e0e0;
-  background: #3e4637;
-}
-
-.hljs-keyword {
-  color: #ffb347;
-}
-
-.hljs-string {
-  color: #90ee90;
-}
-
-.hljs-comment {
-  color: #888888;
-  font-style: italic;
-}
-
-.hljs-number {
-  color: #87cefa;
-}
-
-.hljs-function {
-  color: #f28bff;
-}
-
-.hljs-title {
-  color: #ffd700;
 }
 
 .highlight-wrapper {
@@ -120,7 +61,7 @@ code {
   box-sizing: border-box;
 }
 
-#text {
+textarea.cs-input {
   position: absolute;
   top: 0;
   left: 0;
@@ -141,8 +82,33 @@ code {
   outline: none;
 }
 
-#text::selection {
+textarea.cs-input::selection {
   background: rgba(149, 136, 49, 0.4);
+}
+
+.hljs {
+  color: #e0e0e0;
+  background: #3e4637;
+}
+
+.hljs-keyword {
+  color: #ffb347;
+}
+.hljs-string {
+  color: #90ee90;
+}
+.hljs-comment {
+  color: #888888;
+  font-style: italic;
+}
+.hljs-number {
+  color: #87cefa;
+}
+.hljs-function {
+  color: #f28bff;
+}
+.hljs-title {
+  color: #ffd700;
 }
 
 .flex-wrapper {
@@ -154,6 +120,33 @@ code {
 
 .code-block {
   width: 85%;
+  position: relative;
+}
+
+.code-block .inner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.generated-url-input {
+  flex: 1;
+  padding: 5px;
+  font-family: "ArialPixel", monospace;
+  font-size: 13px;
+  background-color: #3e4637;
+  color: white;
+  border: 1px solid #8c9284;
+  overflow-x: auto;
+}
+
+.cs-btn {
+  padding: 5px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  background-color: #292c21;
+  color: white;
+  border: 1px solid #8c9284;
 }
 
 .send {
