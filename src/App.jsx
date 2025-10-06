@@ -35,7 +35,8 @@ function App() {
       const data = await res.json();
       if (!data.url) throw new Error(data.error || "Failed to create paste");
 
-      setGeneratedUrl(data.url); // link do Pastebin
+      const pasteId = data.url.split("/").pop();
+      setGeneratedUrl(`${window.location.origin}/${pasteId}`); // link do Pastebin
     } catch (err) {
       setGeneratedUrl("Error: " + err.message);
     }
@@ -114,14 +115,6 @@ function App() {
           </button>
         </div>
       </div>
-
-      <a
-        id="sharex-cfg"
-        href="https://raw.githubusercontent.com/otaviozanon/settpaste/main/settpaste.sxcu"
-        className="cs-btn"
-      >
-        get sharex config
-      </a>
     </div>
   );
 }
