@@ -68,7 +68,7 @@ function App() {
 
   return (
     <div className="centered">
-      <h1>glockpaste</h1>
+      <h1>settpaste</h1>
 
       <div id="paste-form">
         <div className="highlight-wrapper" id="highlight-wrapper">
@@ -81,29 +81,39 @@ function App() {
           <textarea
             id="text"
             className="cs-input"
-            placeholder="put your glock here"
+            placeholder="put your note here"
             spellCheck="false"
             value={text}
             onChange={(e) => setText(e.target.value)}
             onScroll={syncScroll}
           ></textarea>
         </div>
-
-        <div className="flex-wrapper">
-          <div className="code-block">
+        <div
+          className="flex-wrapper"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            marginTop: "10px",
+          }}
+        >
+          <div className="code-block" style={{ width: "85%" }}>
             <div className="inner">
-              <button className="cs-btn" onClick={copyUrl}>
+              <button className="cs-btn" id="copy-button" onClick={copyUrl}>
                 Copy
               </button>
-              <input
-                type="text"
-                value={generatedUrl}
-                readOnly
-                className="generated-url-input"
-              />
+
+              <pre>
+                <code id="generated-url">{generatedUrl}</code>
+              </pre>
             </div>
           </div>
-          <button className="cs-btn send" onClick={uploadText}>
+
+          <button
+            className="cs-btn"
+            style={{ width: "14.5%", height: "35px" }}
+            onClick={uploadText}
+          >
             Send
           </button>
         </div>
@@ -111,7 +121,7 @@ function App() {
 
       <a
         id="sharex-cfg"
-        href="https://raw.githubusercontent.com/girlglock/girlglock/refs/heads/main/paste/glockpaste.sxcu"
+        href="https://raw.githubusercontent.com/otaviozanon/settpaste/main/settpaste.sxcu"
         className="cs-btn"
       >
         get sharex config
