@@ -1,0 +1,162 @@
+@import url("https://cdn.jsdelivr.net/gh/ekmas/cs16.css@main/css/cs16.min.css");
+
+body,
+textarea,
+pre,
+code {
+  font-family: "ArialPixel", monospace;
+}
+
+.centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+#sharex-cfg {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  text-decoration: none;
+}
+
+.code-block {
+  overflow-x: hidden;
+}
+
+.code-block .inner {
+  position: relative;
+}
+
+.code-block .inner .cs-btn {
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  z-index: 5;
+}
+
+.code-block .inner pre {
+  background-color: #3e4637;
+  border: 1px solid;
+  border-color: #292c21 #8c9284 #8c9284 #292c21;
+  padding: 5px;
+}
+
+.code-block .inner pre code {
+  white-space: pre-wrap;
+}
+
+.code-block .inner pre code::selection {
+  background-color: #958831;
+  color: #fff;
+}
+
+.hljs {
+  color: #e0e0e0;
+  background: #3e4637;
+}
+
+.hljs-keyword {
+  color: #ffb347;
+}
+
+.hljs-string {
+  color: #90ee90;
+}
+
+.hljs-comment {
+  color: #888888;
+  font-style: italic;
+}
+
+.hljs-number {
+  color: #87cefa;
+}
+
+.hljs-function {
+  color: #f28bff;
+}
+
+.hljs-title {
+  color: #ffd700;
+}
+
+.highlight-wrapper {
+  position: relative;
+  width: 90vw;
+  height: 90vh;
+  resize: both;
+  overflow: hidden;
+  min-width: 300px;
+  min-height: 200px;
+  max-width: 1200px;
+  max-height: 800px;
+  border: 1px solid;
+  border-color: #292c21 #8c9284 #8c9284 #292c21;
+  background: #3e4637;
+  box-sizing: border-box;
+}
+
+#highlighted-output {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #3e4637;
+  border: none;
+  padding: 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  overflow: auto;
+  color: white;
+  pointer-events: none;
+  font-size: 14px;
+  line-height: 1.4;
+  font-family: "ArialPixel", monospace;
+  box-sizing: border-box;
+}
+
+#text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  background: transparent;
+  color: transparent;
+  caret-color: white;
+  border: none;
+  overflow: auto;
+  resize: none;
+  box-sizing: border-box;
+  font-family: "ArialPixel", monospace;
+  outline: none;
+}
+
+#text::selection {
+  background: rgba(149, 136, 49, 0.4);
+}
+
+.flex-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.code-block {
+  width: 85%;
+}
+
+.send {
+  width: 14.5%;
+  height: 35px;
+}
