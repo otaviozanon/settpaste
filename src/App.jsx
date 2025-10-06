@@ -6,9 +6,7 @@ import "./App.css";
 function App() {
   const [text, setText] = useState("");
   const [highlighted, setHighlighted] = useState("");
-  const [generatedUrl, setGeneratedUrl] = useState(
-    "https://settpaste.vercel.app/paste/"
-  );
+  const [generatedUrl, setGeneratedUrl] = useState("");
 
   // 🔹 Atualiza o destaque de sintaxe
   useEffect(() => {
@@ -24,42 +22,40 @@ function App() {
     if (pasteId) fetchPaste(pasteId);
   }, []);
 
+  // 🔹 Envia o texto para o Pastebin via API route
   async function uploadText() {
     if (!text.trim()) return;
-    const blob = new Blob([text], { type: "text/plain" });
-    const formData = new FormData();
-    formData.append("file", blob, "paste.txt");
 
     try {
-      const proxyUrl = "https://api.allorigins.win/raw?url=https://0x0.st";
-      const res = await fetch(proxyUrl, {
+      const res = await fetch("/api/pastebin", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, title: "Settpaste Note" }),
       });
-      const url = await res.text();
-      const id = url.trim().split("/").pop();
-      setGeneratedUrl(
-        `${window.location.origin}${window.location.pathname}?id=${id}`
-      );
+      const data = await res.json();
+      if (!data.url) throw new Error(data.error || "Failed to create paste");
+
+      setGeneratedUrl(data.url); // link do Pastebin
+      alert("Paste criado com sucesso!");
     } catch (err) {
       setGeneratedUrl("Error: " + err.message);
     }
   }
 
+  // 🔹 Busca paste pelo ID (caso queira exibir localmente)
   async function fetchPaste(pasteId) {
     try {
-      const res = await fetch(
-        `https://api.allorigins.win/raw?url=https://0x0.st/${pasteId}`
-      );
+      const res = await fetch(`/api/fetch/${pasteId}`);
       if (!res.ok) throw new Error("not found");
-      const t = await res.text();
-      setText(t);
+      const t = await res.json();
+      setText(t.text);
     } catch (err) {
       setText("Error loading paste: " + err.message);
     }
   }
 
   function copyUrl() {
+    if (!generatedUrl) return alert("No URL to copy");
     navigator.clipboard.writeText(generatedUrl);
     alert("URL copied!");
   }
