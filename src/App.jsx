@@ -31,7 +31,7 @@ function App() {
     formData.append("file", blob, "paste.txt");
 
     try {
-      const res = await fetch("https://0x0.st", {
+      const res = await fetch("https://corsproxy.io/?https://0x0.st", {
         method: "POST",
         body: formData,
       });
