@@ -68,7 +68,6 @@ function App() {
   return (
     <div className="centered">
       <h1>settpaste</h1>
-
       <div id="paste-form">
         <div className="highlight-wrapper" id="highlight-wrapper">
           <pre>
@@ -101,13 +100,11 @@ function App() {
               <button className="cs-btn" id="copy-button" onClick={copyUrl}>
                 Copy
               </button>
-
               <pre>
                 <code id="generated-url">{generatedUrl}</code>
               </pre>
             </div>
           </div>
-
           <button
             className="cs-btn"
             style={{ width: "14.5%", height: "35px" }}
