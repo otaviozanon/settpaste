@@ -68,7 +68,7 @@ function App() {
 
   return (
     <div className="centered">
-      <h1>settpaste</h1>
+      <h1>glockpaste</h1>
 
       <div id="paste-form">
         <div className="highlight-wrapper" id="highlight-wrapper">
@@ -81,7 +81,7 @@ function App() {
           <textarea
             id="text"
             className="cs-input"
-            placeholder="put your note here"
+            placeholder="put your glock here"
             spellCheck="false"
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -95,9 +95,12 @@ function App() {
               <button className="cs-btn" onClick={copyUrl}>
                 Copy
               </button>
-              <pre>
-                <code id="generated-url">{generatedUrl}</code>
-              </pre>
+              <input
+                type="text"
+                value={generatedUrl}
+                readOnly
+                className="generated-url-input"
+              />
             </div>
           </div>
           <button className="cs-btn send" onClick={uploadText}>
@@ -108,7 +111,7 @@ function App() {
 
       <a
         id="sharex-cfg"
-        href="https://raw.githubusercontent.com/otaviozanon/settpaste/main/settpaste.sxcu"
+        href="https://raw.githubusercontent.com/girlglock/girlglock/refs/heads/main/paste/glockpaste.sxcu"
         className="cs-btn"
       >
         get sharex config
