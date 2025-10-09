@@ -24,24 +24,47 @@ function App() {
     setTimeout(() => setToastVisible(false), 2000);
   };
 
-  // Send text to pastebin
+  // Send text to Supabase first, fallback to Pastebin if fails
   async function uploadText() {
     if (!text.trim()) return;
 
     try {
-      const res = await fetch("/api/pastebin", {
+      const supaRes = await fetch("/api/paste", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, title: "Settpaste Note" }),
       });
-      const data = await res.json();
-      if (!data.url) throw new Error(data.error || "Failed to create paste");
 
-      setGeneratedUrl(data.url);
-      showToast("Sent to Pastebin!");
-    } catch (err) {
-      setGeneratedUrl("Error: " + err.message);
-      showToast("Error sending!");
+      if (!supaRes.ok) throw new Error("Supabase upload failed");
+
+      const supaData = await supaRes.json();
+      if (!supaData.url)
+        throw new Error(supaData.error || "No URL from Supabase");
+
+      setGeneratedUrl(supaData.url);
+      showToast("Sent to SettPaste!");
+    } catch (supabaseError) {
+      console.error("Supabase failed:", supabaseError.message);
+      showToast("Supabase failed — trying Pastebin...");
+
+      try {
+        const pasteRes = await fetch("/api/pastebin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, title: "Settpaste Fallback" }),
+        });
+
+        const pasteData = await pasteRes.json();
+        if (!pasteData.url)
+          throw new Error(pasteData.error || "Pastebin failed");
+
+        setGeneratedUrl(pasteData.url);
+        showToast("Sent to Pastebin!");
+      } catch (pasteError) {
+        console.error("Pastebin also failed:", pasteError.message);
+        setGeneratedUrl("Error: " + pasteError.message);
+        showToast("All uploads failed!");
+      }
     }
   }
 
