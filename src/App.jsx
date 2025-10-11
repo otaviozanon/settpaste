@@ -9,9 +9,8 @@ function App() {
   const [generatedUrl, setGeneratedUrl] = useState("");
   const [toast, setToast] = useState(null);
   const [toastVisible, setToastVisible] = useState(false);
-  const [sent, setSent] = useState(false); // ← novo estado
+  const [sent, setSent] = useState(false); // controla Send / Swap Host
 
-  // Update highlight syntax
   useEffect(() => {
     if (!text.trim()) {
       setHighlighted("");
@@ -21,22 +20,19 @@ function App() {
     setHighlighted(result.value);
   }, [text]);
 
-  // Always reset "sent" when text changes
+  // volta para modo "Send" se o texto mudar
   useEffect(() => {
     setSent(false);
   }, [text]);
 
-  // Toast animation
   const showToast = (message) => {
     setToast(message);
     setToastVisible(true);
     setTimeout(() => setToastVisible(false), 2000);
   };
 
-  // Send text to Pastebin
-  async function uploadText() {
-    if (!text.trim()) return;
-
+  // Função para enviar ao Pastebin
+  async function uploadToPastebin() {
     try {
       const res = await fetch("/api/pastebin", {
         method: "POST",
@@ -45,15 +41,38 @@ function App() {
       });
       const data = await res.json();
       if (!data.url) throw new Error(data.error || "Failed to create paste");
-
       setGeneratedUrl(data.url);
       showToast("Sent to Pastebin!");
-      setSent(true); // ← muda para Swap Host
+      setSent(true);
     } catch (err) {
       setGeneratedUrl("Error: " + err.message);
       showToast("Error sending!");
-      setSent(false);
     }
+  }
+
+  // Função para enviar ao SafeNote
+  async function uploadToSafeNote() {
+    try {
+      const res = await fetch("/api/safenote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      const data = await res.json();
+      if (!data.url) throw new Error(data.error || "Failed to create SafeNote");
+      setGeneratedUrl(data.url);
+      showToast("Sent to SafeNote!");
+    } catch (err) {
+      setGeneratedUrl("Error: " + err.message);
+      showToast("Error sending!");
+    }
+  }
+
+  // Decide qual host usar
+  function handleSend() {
+    if (!text.trim()) return showToast("Empty note!");
+    if (sent) uploadToSafeNote();
+    else uploadToPastebin();
   }
 
   function copyUrl() {
@@ -111,11 +130,10 @@ function App() {
             </div>
           </div>
 
-          {/* Botão dinâmico */}
           <button
             className="cs-btn"
             style={{ width: "14.5%", height: "35px" }}
-            onClick={uploadText}
+            onClick={handleSend}
           >
             {sent ? "Swap Host" : "Send"}
           </button>
