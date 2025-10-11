@@ -9,22 +9,31 @@ function App() {
   const [generatedUrl, setGeneratedUrl] = useState("");
   const [toast, setToast] = useState(null);
   const [toastVisible, setToastVisible] = useState(false);
+  const [sent, setSent] = useState(false); // ← novo estado
 
-  // Update highlight sintax
+  // Update highlight syntax
   useEffect(() => {
-    if (!text.trim()) return setHighlighted("");
+    if (!text.trim()) {
+      setHighlighted("");
+      return;
+    }
     const result = hljs.highlightAuto(text);
     setHighlighted(result.value);
   }, [text]);
 
-  // Animation toast
+  // Always reset "sent" when text changes
+  useEffect(() => {
+    setSent(false);
+  }, [text]);
+
+  // Toast animation
   const showToast = (message) => {
     setToast(message);
     setToastVisible(true);
     setTimeout(() => setToastVisible(false), 2000);
   };
 
-  // Send text to pastebin
+  // Send text to Pastebin
   async function uploadText() {
     if (!text.trim()) return;
 
@@ -39,9 +48,11 @@ function App() {
 
       setGeneratedUrl(data.url);
       showToast("Sent to Pastebin!");
+      setSent(true); // ← muda para Swap Host
     } catch (err) {
       setGeneratedUrl("Error: " + err.message);
       showToast("Error sending!");
+      setSent(false);
     }
   }
 
@@ -99,12 +110,14 @@ function App() {
               </pre>
             </div>
           </div>
+
+          {/* Botão dinâmico */}
           <button
             className="cs-btn"
             style={{ width: "14.5%", height: "35px" }}
             onClick={uploadText}
           >
-            Send
+            {sent ? "Swap Host" : "Send"}
           </button>
         </div>
       </div>
