@@ -3,7 +3,7 @@
 Fast pastebin with syntax highlighting and automatic provider rotation.
 
 <p align="center">
-  <a href="https://settpaste.vercel.app/"><strong>Live Watch</strong></a>
+  <a href="https://settpaste.vercel.app/"><strong>SETT Paste</strong></a>
 </p>
 
 ## Features
