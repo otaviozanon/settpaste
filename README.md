@@ -2,6 +2,10 @@
 
 Fast pastebin with syntax highlighting and automatic provider rotation.
 
+<p align="center">
+  <a href="https://settpaste.vercel.app/"><strong>Live Watch</strong></a>
+</p>
+
 ## Features
 
 - 🎨 Syntax highlighting (JavaScript, Python, JSON, XML, CSS, Bash)
