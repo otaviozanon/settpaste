@@ -1,16 +1,40 @@
-# React + Vite
+# settpaste
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Fast pastebin with syntax highlighting and automatic provider rotation.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🎨 Syntax highlighting (JavaScript, Python, JSON, XML, CSS, Bash)
+- 🔄 Provider rotation (paste.rs → SafeNote)
+- 📋 One-click URL copy
+- 🚀 Zero API keys required
+- 🌙 CS16-inspired retro UI
 
-## React Compiler
+## Providers
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Provider     | Type      | Lifetime      | Notes             |
+| ------------ | --------- | ------------- | ----------------- |
+| **paste.rs** | Public    | Permanent     | Simple text paste |
+| **SafeNote** | Encrypted | 48h / 3 reads | Self-destructing  |
 
-## Expanding the ESLint configuration
+Each send rotates to the next provider.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Tech Stack
+
+- React 19 + Vite 6
+- highlight.js (selective imports)
+- Vercel Serverless Functions (CORS proxy)
+
+## Structure
+
+```
+├── api/
+│   ├── paste-rs.js     # paste.rs proxy
+│   └── safenote.js     # SafeNote proxy
+├── src/
+│   ├── App.jsx         # Main component
+│   ├── App.css         # Styles
+│   └── main.jsx        # Entry point
+├── index.html
+└── vite.config.js
+```

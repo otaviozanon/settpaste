@@ -161,10 +161,35 @@ code {
   z-index: 9999;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
 .toast.show {
   opacity: 0.95;
   transform: translateX(-50%) translateY(0);
+}
+
+/* Flex wrapper (evita inline styles) */
+.flex-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.url-output {
+  width: 85%;
+}
+
+.send-button {
+  width: 14.5%;
+  height: 35px;
+}
+
+.send-button:disabled,
+.cs-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

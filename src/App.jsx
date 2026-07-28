@@ -1,7 +1,33 @@
-import { useState, useEffect } from "react";
-import hljs from "highlight.js";
+import { useState, useEffect, useRef, useCallback } from "react";
+import hljs from "highlight.js/lib/core";
+import javascript from "highlight.js/lib/languages/javascript";
+import python from "highlight.js/lib/languages/python";
+import json from "highlight.js/lib/languages/json";
+import xml from "highlight.js/lib/languages/xml";
+import css from "highlight.js/lib/languages/css";
+import bash from "highlight.js/lib/languages/bash";
 import "highlight.js/styles/base16/solarized-dark.css";
 import "./App.css";
+
+// Registra só linguagens comuns (reduz bundle de 1.1MB → ~200KB)
+hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("python", python);
+hljs.registerLanguage("json", json);
+hljs.registerLanguage("xml", xml);
+hljs.registerLanguage("css", css);
+hljs.registerLanguage("bash", bash);
+
+const PROVIDERS = [
+  { endpoint: "/api/paste-rs", name: "paste.rs" },
+  { endpoint: "/api/safenote", name: "SafeNote" },
+];
+
+const TOAST_MESSAGES = {
+  errorSending: "Error sending!",
+  urlCopied: "URL copied!",
+  noUrl: "No URL to copy",
+  emptyNote: "Empty note!",
+};
 
 function App() {
   const [text, setText] = useState("");
@@ -9,7 +35,11 @@ function App() {
   const [generatedUrl, setGeneratedUrl] = useState("");
   const [toast, setToast] = useState(null);
   const [toastVisible, setToastVisible] = useState(false);
-  const [sent, setSent] = useState(false); // controla Send / Swap Host
+  const [currentProviderIndex, setCurrentProviderIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const highlightRef = useRef(null);
+  const toastTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (!text.trim()) {
@@ -20,72 +50,88 @@ function App() {
     setHighlighted(result.value);
   }, [text]);
 
-  // volta para modo "Send" se o texto mudar
+  // Reseta provider index quando texto mudar
   useEffect(() => {
-    setSent(false);
+    setCurrentProviderIndex(0);
   }, [text]);
 
-  const showToast = (message) => {
+  // Cleanup timeout ao desmontar
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const showToast = useCallback((message) => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
     setToast(message);
     setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 2000);
-  };
+    toastTimeoutRef.current = setTimeout(() => setToastVisible(false), 2000);
+  }, []);
 
-  // Função para enviar ao Pastebin
-  async function uploadToPastebin() {
-    try {
-      const res = await fetch("/api/pastebin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, title: "Settpaste Note" }),
-      });
-      const data = await res.json();
-      if (!data.url) throw new Error(data.error || "Failed to create paste");
-      setGeneratedUrl(data.url);
-      showToast("Sent to Pastebin!");
-      setSent(true);
-    } catch (err) {
-      setGeneratedUrl("Error: " + err.message);
-      showToast("Error sending!");
+  // Upload genérico (DRY)
+  const uploadToHost = useCallback(
+    async (endpoint, payload, successMessage) => {
+      setIsLoading(true);
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Upload failed");
+        }
+        const data = await res.json();
+        if (!data.url) throw new Error("No URL returned");
+        setGeneratedUrl(data.url);
+        showToast(successMessage);
+        return true;
+      } catch (err) {
+        setGeneratedUrl("Error: " + err.message);
+        showToast(TOAST_MESSAGES.errorSending);
+        return false;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [showToast],
+  );
+
+  // Envia para o provider atual
+  const handleSend = useCallback(async () => {
+    if (!text.trim()) return showToast(TOAST_MESSAGES.emptyNote);
+
+    const provider = PROVIDERS[currentProviderIndex];
+    const success = await uploadToHost(
+      provider.endpoint,
+      { text },
+      `Sent to ${provider.name}!`,
+    );
+
+    if (success) {
+      // Avança para o próximo provider (rotação circular)
+      setCurrentProviderIndex((prev) => (prev + 1) % PROVIDERS.length);
     }
-  }
+  }, [text, currentProviderIndex, showToast, uploadToHost]);
 
-  // Função para enviar ao SafeNote
-  async function uploadToSafeNote() {
-    try {
-      const res = await fetch("/api/safenote", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-      const data = await res.json();
-      if (!data.url) throw new Error(data.error || "Failed to create SafeNote");
-      setGeneratedUrl(data.url);
-      showToast("Sent to SafeNote!");
-    } catch (err) {
-      setGeneratedUrl("Error: " + err.message);
-      showToast("Error sending!");
-    }
-  }
-
-  // Decide qual host usar
-  function handleSend() {
-    if (!text.trim()) return showToast("Empty note!");
-    if (sent) uploadToSafeNote();
-    else uploadToPastebin();
-  }
-
-  function copyUrl() {
-    if (!generatedUrl) return showToast("No URL to copy");
+  const copyUrl = useCallback(() => {
+    if (!generatedUrl) return showToast(TOAST_MESSAGES.noUrl);
     navigator.clipboard.writeText(generatedUrl);
-    showToast("URL copied!");
-  }
+    showToast(TOAST_MESSAGES.urlCopied);
+  }, [generatedUrl, showToast]);
 
-  function syncScroll(e) {
-    const highlight = document.getElementById("highlighted-output");
-    highlight.scrollTop = e.target.scrollTop;
-    highlight.scrollLeft = e.target.scrollLeft;
-  }
+  const syncScroll = useCallback((e) => {
+    if (highlightRef.current) {
+      highlightRef.current.scrollTop = e.target.scrollTop;
+      highlightRef.current.scrollLeft = e.target.scrollLeft;
+    }
+  }, []);
 
   return (
     <div className="centered">
@@ -95,6 +141,7 @@ function App() {
         <div className="highlight-wrapper" id="highlight-wrapper">
           <pre>
             <code
+              ref={highlightRef}
               id="highlighted-output"
               dangerouslySetInnerHTML={{ __html: highlighted }}
             ></code>
@@ -107,21 +154,20 @@ function App() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             onScroll={syncScroll}
+            aria-label="Paste content"
           ></textarea>
         </div>
 
-        <div
-          className="flex-wrapper"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            marginTop: "10px",
-          }}
-        >
-          <div className="code-block" style={{ width: "85%" }}>
+        <div className="flex-wrapper">
+          <div className="code-block url-output">
             <div className="inner">
-              <button className="cs-btn" id="copy-button" onClick={copyUrl}>
+              <button
+                className="cs-btn"
+                id="copy-button"
+                onClick={copyUrl}
+                disabled={!generatedUrl}
+                aria-label="Copy generated URL"
+              >
                 Copy
               </button>
               <pre>
@@ -131,11 +177,16 @@ function App() {
           </div>
 
           <button
-            className="cs-btn"
-            style={{ width: "14.5%", height: "35px" }}
+            className="cs-btn send-button"
             onClick={handleSend}
+            disabled={isLoading}
+            aria-label={`Send to ${PROVIDERS[currentProviderIndex].name}`}
           >
-            {sent ? "Swap Host" : "Send"}
+            {isLoading
+              ? "..."
+              : currentProviderIndex === 0
+                ? "Send"
+                : `Send to ${PROVIDERS[currentProviderIndex].name}`}
           </button>
         </div>
       </div>
