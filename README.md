@@ -42,3 +42,7 @@ Each send rotates to the next provider.
 ├── index.html
 └── vite.config.js
 ```
+
+## 📄 License
+
+GPL-3.0. See [LICENSE](/LICENSE).
