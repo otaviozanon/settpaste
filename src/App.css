@@ -87,18 +87,26 @@ code {
 
 .highlight-wrapper {
   position: relative;
-  width: 90vw;
-  height: 90vh;
-  resize: both;
-  overflow: hidden;
-  min-width: 300px;
-  min-height: 200px;
+  width: 94vw;
   max-width: 1200px;
+  height: 80vh;
   max-height: 800px;
+  min-width: 0;
+  min-height: 200px;
+  overflow: hidden;
   border: 1px solid;
   border-color: #292c21 #8c9284 #8c9284 #292c21;
   background: #3e4637;
   box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .highlight-wrapper {
+    width: 90vw;
+    height: 90vh;
+    min-width: 300px;
+    resize: both;
+  }
 }
 
 #highlighted-output {
@@ -174,17 +182,20 @@ code {
 /* Flex wrapper (evita inline styles) */
 .flex-wrapper {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-top: 10px;
 }
 
 .url-output {
-  width: 85%;
+  flex: 1;
+  min-width: 200px;
 }
 
 .send-button {
-  width: 14.5%;
+  width: auto;
+  min-width: 80px;
   height: 35px;
 }
 
